@@ -1,0 +1,6 @@
+{
+  "name": "Federal Vendor Intelligence",
+  "description": "Identify top vendors for SAM.gov opportunities using award data and API analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
