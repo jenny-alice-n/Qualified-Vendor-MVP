@@ -1,17 +1,8 @@
 import { useState, useEffect } from "react";
 import { 
-  Building2, 
-  Settings, 
-  CheckCircle, 
-  HelpCircle, 
-  Sliders, 
   ArrowLeft, 
   AlertCircle,
-  FileText,
-  Search,
-  Grid,
   Info,
-  Database,
   Activity
 } from "lucide-react";
 import { SavedConnectionSettings, Vendor, SearchResponse } from "./types";
@@ -28,7 +19,6 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchPerformed, setSearchPerformed] = useState(false);
-  const [copiedAppUrl, setCopiedAppUrl] = useState(false);
 
   // Load and manage saved live-connection parameters from localStorage
   const [settings, setSettings] = useState<SavedConnectionSettings>(() => {
@@ -110,7 +100,6 @@ export default function App() {
           scopeOfWork: formData.scopeOfWork,
           estimatedValue: formData.estimatedValue,
           placeOfPerformance: formData.placeOfPerformance,
-          identificationStrategy: formData.identificationStrategy
         };
 
         let response;
@@ -143,7 +132,6 @@ export default function App() {
                 scopeOfWork: formData.scopeOfWork,
                 estimatedValue: formData.estimatedValue,
                 placeOfPerformance: formData.placeOfPerformance,
-                identificationStrategy: formData.identificationStrategy
               }),
             });
           } catch (fetchErr: any) {

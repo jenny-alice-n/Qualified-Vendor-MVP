@@ -23,7 +23,6 @@ export default function OpportunityForm({
       value: "$5M–$10M",
       place: "Austin, TX / Grand Rapids, MI",
       keywords: "medical equipment, surgical tables, patient safety, ultrasound, wheelchair, sterilizers, healthcare logistics",
-      strategy: "Auto (USASpending + web)",
     },
     {
       label: "Fraud Detection — SSA",
@@ -34,7 +33,6 @@ export default function OpportunityForm({
       value: "$10M–$25M",
       place: "Washington, DC",
       keywords: "AI/ML, fraud detection, anomaly detection, MLOps, model explainability, OMB M-24-10, real-time processing, FedRAMP",
-      strategy: "Auto (USASpending + web)",
     },
     {
       label: "Cloud Infra — DHS",
@@ -45,7 +43,6 @@ export default function OpportunityForm({
       value: "$25M+",
       place: "Reston, VA / Remote",
       keywords: "DevSecOps, Kubernetes, Hybrid Cloud, Zero Trust, CIS Benchmarks, AWS, Azure, IAM policies",
-      strategy: "USASpending awards",
     },
     {
       label: "Cybersecurity — DoD",
@@ -56,7 +53,6 @@ export default function OpportunityForm({
       value: "$1M–$5M",
       place: "Fort Meade, MD",
       keywords: "CMMC Level 2, NIST 800-171, vulnerability analysis, threat vector logs, pen-testing, SIEM configuration",
-      strategy: "Web capability only",
     },
   ];
 
@@ -68,7 +64,6 @@ export default function OpportunityForm({
   const [value, setValue] = useState(quickFills[1].value);
   const [place, setPlace] = useState(quickFills[1].place);
   const [keywords, setKeywords] = useState(quickFills[1].keywords);
-  const [strategy, setStrategy] = useState(quickFills[1].strategy);
 
   const applyQuickFill = (fill: typeof quickFills[0]) => {
     setTitle(fill.title);
@@ -78,13 +73,12 @@ export default function OpportunityForm({
     setValue(fill.value);
     setPlace(fill.place);
     setKeywords(fill.keywords);
-    setStrategy(fill.strategy);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSearch({
-      searchText: keywords || title, // Falling back nicely to keywords as requested by prompt
+      searchText: keywords || title,
       solicitationTitle: title,
       naicsCode: naics,
       setAsideType: setAside,
@@ -92,7 +86,6 @@ export default function OpportunityForm({
       estimatedValue: value,
       placeOfPerformance: place,
       keywordsList: keywords,
-      identificationStrategy: strategy,
     });
   };
 
@@ -186,6 +179,7 @@ export default function OpportunityForm({
             >
               <option value="Any / Not specified" className="bg-slate-900 text-white">Any / Not specified</option>
               <option value="Total Small Business" className="bg-slate-900 text-white">Total Small Business</option>
+              <option value="Veteran-Owned Small Business" className="bg-slate-900 text-white">Veteran-Owned Small Business (VOSB)</option>
               <option value="Service-Disabled Veteran-Owned Business" className="bg-slate-900 text-white">Service-Disabled Veteran-Owned (SDVOSB)</option>
               <option value="SBA-Certified Women-Owned Small Business" className="bg-slate-900 text-white">SBA Women-Owned (WOSB)</option>
               <option value="Minority-Owned Business" className="bg-slate-900 text-white">Minority-Owned Business</option>
@@ -253,35 +247,6 @@ export default function OpportunityForm({
             placeholder="e.g. medical equipment, surgical tables, patient safety, ultrasound, wheelchair"
             className="w-full rounded-xl border border-white/12 bg-black/25 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-indigo-400 focus:bg-black/35 focus:ring-1 focus:ring-indigo-400 transition-all outline-none"
           />
-        </div>
-
-        {/* Vendor Identification Strategy Selector */}
-        <div>
-          <label className="block text-xs font-bold text-indigo-300 uppercase tracking-wide mb-2 font-sans">
-            Vendor Identification Strategy
-          </label>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            {[
-              { id: "Auto (USASpending + web)", label: "Auto (USASpending + web)", desc: "AI-fused database match" },
-              { id: "USASpending awards", label: "USASpending awardsOnly", desc: "Historical transactions" },
-              { id: "Web capability only", label: "Web capabilities", desc: "Live-crawled profiles" },
-            ].map((opt) => (
-              <button
-                id={`strategy-${opt.id.replace(/\s+/g, "-").toLowerCase()}`}
-                key={opt.id}
-                type="button"
-                onClick={() => setStrategy(opt.id)}
-                className={`flex flex-col text-left p-3.5 rounded-xl border transition-all cursor-pointer ${
-                  strategy === opt.id
-                    ? "border-indigo-500 bg-indigo-550/20 text-white shadow-lg shadow-indigo-550/10"
-                    : "border-white/10 bg-white/5 hover:bg-white/10 text-slate-300"
-                }`}
-              >
-                <span className="text-xs font-bold block">{opt.label}</span>
-                <span className="text-[10px] text-slate-400 mt-0.5 leading-tight">{opt.desc}</span>
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* Submit */}

@@ -20,7 +20,6 @@ import {
 import { Vendor } from "../types";
 
 interface VendorCardProps {
-  key?: string | number;
   vendor: Vendor;
   index: number;
 }

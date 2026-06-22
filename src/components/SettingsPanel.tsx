@@ -236,9 +236,9 @@ export default function SettingsPanel({
                       onChange={(e) => handleChange("vendorSource", e.target.value)}
                       className="w-full rounded-lg border border-white/12 bg-black/35 px-4 py-2.5 text-sm text-white focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition-all outline-none"
                     >
+                      <option value="VENDOR_SUMMARY" className="bg-slate-900 text-white">VENDOR_SUMMARY</option>
                       <option value="AWARD_SUMMARY" className="bg-slate-900 text-white">AWARD_SUMMARY</option>
-                      <option value="SAM_REGISTRATION" className="bg-slate-900 text-white">SAM_REGISTRATION</option>
-                      <option value="COMBINED" className="bg-slate-900 text-white">COMBINED (SAM + AWARDS)</option>
+                      <option value="MIXED" className="bg-slate-900 text-white">MIXED</option>
                     </select>
                   </div>
 
