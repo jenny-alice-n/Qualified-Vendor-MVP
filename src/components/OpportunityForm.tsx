@@ -23,17 +23,7 @@ export default function OpportunityForm({
       value: "$5M–$10M",
       place: "Austin, TX / Grand Rapids, MI",
       keywords: "medical equipment, surgical tables, patient safety, ultrasound, wheelchair, sterilizers, healthcare logistics",
-    },
-    {
-      label: "Fraud Detection — SSA",
-      title: "Artificial Intelligence and Machine Learning Platform for Fraud Detection at the Social Security Administration",
-      naics: "541511",
-      setAside: "Any / Not specified",
-      scope: "The Social Security Administration (SSA) Office of Anti-Fraud Programs requires a contractor to design, develop, and operate an AI/ML-powered fraud detection platform capable of processing 10+ million benefit transactions daily in near real-time. The platform shall include supervised and unsupervised ML models for anomaly detection, model explainability layer, and MLOps pipeline.",
-      value: "$10M–$25M",
-      place: "Washington, DC",
-      keywords: "AI/ML, fraud detection, anomaly detection, MLOps, model explainability, OMB M-24-10, real-time processing, FedRAMP",
-    },
+    },/*
     {
       label: "Cloud Infra — DHS",
       title: "Secure Enterprise Cloud Infrastructure & Migration Support Services",
@@ -43,7 +33,8 @@ export default function OpportunityForm({
       value: "$25M+",
       place: "Reston, VA / Remote",
       keywords: "DevSecOps, Kubernetes, Hybrid Cloud, Zero Trust, CIS Benchmarks, AWS, Azure, IAM policies",
-    },
+    },*/
+    /*
     {
       label: "Cybersecurity — DoD",
       title: "NIST 800-171 Compliance Auditing & Threat Identification Protocol Suite",
@@ -53,17 +44,67 @@ export default function OpportunityForm({
       value: "$1M–$5M",
       place: "Fort Meade, MD",
       keywords: "CMMC Level 2, NIST 800-171, vulnerability analysis, threat vector logs, pen-testing, SIEM configuration",
+    },*/
+    {
+      label: "Facilities Mgmt — GSA",
+      title: "Integrated Facilities Management and Building Operations Services",
+      naics: "561210",
+      setAside: "Total Small Business",
+      scope: "The General Services Administration (GSA) requires a contractor to provide full-spectrum facilities management services including janitorial, HVAC maintenance, electrical systems, plumbing, grounds maintenance, pest control, and emergency repairs across 15+ federal buildings in the National Capital Region.",
+      value: "$10M–$25M",
+      place: "Washington, DC / Arlington, VA",
+      keywords: "facilities management, HVAC, building operations, janitorial, grounds maintenance, federal buildings, preventive maintenance",
+    },/*
+    {
+      label: "Training — OPM",
+      title: "Federal Workforce Leadership Development and E-Learning Platform",
+      naics: "611430",
+      setAside: "SBA-Certified Women-Owned Small Business",
+      scope: "The Office of Personnel Management (OPM) requires development and delivery of a comprehensive leadership training program for GS-13 through SES-level federal employees. Deliverables include an LMS platform, instructor-led virtual workshops, executive coaching, and competency assessment tools aligned with OPM's ECQs.",
+      value: "$1M–$5M",
+      place: "Washington, DC / Virtual",
+      keywords: "leadership development, e-learning, LMS, executive coaching, federal workforce training, ECQ, competency assessment, OPM",
+    },*/
+    {
+      label: "Environmental — EPA",
+      title: "Hazardous Waste Site Assessment and Remediation Support Services",
+      naics: "562910",
+      setAside: "Total Small Business",
+      scope: "The Environmental Protection Agency (EPA) requires qualified environmental engineering firms to conduct Phase I/II site assessments, develop remediation action plans, perform soil and groundwater sampling, and manage cleanup operations at Superfund sites. Contractor must hold relevant state certifications and maintain 24-hour emergency response capability.",
+      value: "$5M–$10M",
+      place: "Edison, NJ / Cincinnati, OH",
+      keywords: "hazardous waste, Superfund, site remediation, groundwater sampling, environmental engineering, CERCLA, Phase II ESA, emergency response",
+    },/*
+    {
+      label: "Telecom — FCC",
+      title: "5G Spectrum Monitoring and Wireless Infrastructure Assessment",
+      naics: "517312",
+      setAside: "Any / Not specified",
+      scope: "The Federal Communications Commission (FCC) requires specialized RF engineering services to monitor 5G spectrum utilization, detect unauthorized transmissions, assess small-cell deployment compliance, and develop interference mitigation strategies across major metropolitan areas.",
+      value: "$1M–$5M",
+      place: "Columbia, MD / Nationwide",
+      keywords: "5G, spectrum monitoring, RF engineering, wireless infrastructure, small-cell, interference mitigation, FCC compliance, telecommunications",
+    },*/
+    {
+      label: "Shipbuilding — Navy",
+      title: "Naval Vessel Maintenance, Repair, and Overhaul (MRO) Services",
+      naics: "336611",
+      setAside: "Any / Not specified",
+      scope: "Naval Sea Systems Command (NAVSEA) requires qualified shipyard contractors to perform depot-level maintenance, dry-dock repairs, hull preservation, propulsion system overhauls, and combat systems upgrades on DDG-51 class destroyers during scheduled maintenance availabilities.",
+      value: "$25M+",
+      place: "Norfolk, VA / San Diego, CA",
+      keywords: "shipbuilding, naval maintenance, dry-dock, MRO, DDG-51, propulsion overhaul, hull repair, NAVSEA, combat systems",
     },
   ];
 
-  // Primary form states prefilled with the SSA Fraud Detection opportunity as default
-  const [title, setTitle] = useState(quickFills[1].title);
-  const [naics, setNaics] = useState(quickFills[1].naics);
-  const [setAside, setSetAside] = useState(quickFills[1].setAside);
-  const [scope, setScope] = useState(quickFills[1].scope);
-  const [value, setValue] = useState(quickFills[1].value);
-  const [place, setPlace] = useState(quickFills[1].place);
-  const [keywords, setKeywords] = useState(quickFills[1].keywords);
+  // Primary form states - blank by default
+  const [title, setTitle] = useState("");
+  const [naics, setNaics] = useState("");
+  const [setAside, setSetAside] = useState("Any / Not specified");
+  const [scope, setScope] = useState("");
+  const [value, setValue] = useState("");
+  const [place, setPlace] = useState("");
+  const [keywords, setKeywords] = useState("");
 
   const applyQuickFill = (fill: typeof quickFills[0]) => {
     setTitle(fill.title);
@@ -77,8 +118,11 @@ export default function OpportunityForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    let searchText = keywords || title;
+    if (naics) searchText += `, naics: ${naics}`;
+    if (setAside && setAside !== "Any / Not specified") searchText += `, setAside: ${setAside}`;
     onSearch({
-      searchText: keywords || title,
+      searchText,
       solicitationTitle: title,
       naicsCode: naics,
       setAsideType: setAside,
@@ -99,9 +143,6 @@ export default function OpportunityForm({
             <FileText className="h-5 w-5 text-indigo-400" />
             Define Solicitation Opportunities
           </h2>
-          <p className="text-xs text-slate-400 font-sans mt-0.5">
-            Parameters entered below are automatically bundled into the JSON payload requested by your API.
-          </p>
         </div>
 
         {activeLiveMode && (
@@ -115,7 +156,7 @@ export default function OpportunityForm({
       {/* Quick Fill Buttons */}
       <div className="mb-6">
         <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-305 block mb-2 font-mono">
-          🚀 One-Click Quick Fill Solicitations:
+          Quick Fill Solicitations:
         </span>
         <div className="flex flex-wrap gap-2">
           {quickFills.map((fill) => (
@@ -237,7 +278,7 @@ export default function OpportunityForm({
         {/* Keywords */}
         <div>
           <label className="block text-xs font-bold text-indigo-300 uppercase tracking-wide mb-1.5 font-sans">
-            Key Requirements / Keywords (Transmitted as <code className="bg-white/10 px-1.5 py-0.5 rounded text-indigo-300 font-mono">searchText</code>)
+            Key Requirements / Keywords
           </label>
           <input
             id="form-keywords"

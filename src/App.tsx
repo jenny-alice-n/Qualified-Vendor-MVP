@@ -11,14 +11,18 @@ import Navbar from "./components/Navbar";
 import SettingsPanel from "./components/SettingsPanel";
 import OpportunityForm from "./components/OpportunityForm";
 import VendorCard from "./components/VendorCard";
-import HowItWorks from "./components/HowItWorks";
+import ComparePanel from "./components/ComparePanel";
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<"search" | "results" | "about">("search");
+  const [activeTab, setActiveTab] = useState<"search" | "results">("search");
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchPerformed, setSearchPerformed] = useState(false);
+  const [searchedNaics, setSearchedNaics] = useState("");
+  const [selectedForCompare, setSelectedForCompare] = useState<string[]>([]);
+  const [showCompareView, setShowCompareView] = useState(false);
+  const [searchedKeywords, setSearchedKeywords] = useState("");
 
   // Load and manage saved live-connection parameters from localStorage
   const [settings, setSettings] = useState<SavedConnectionSettings>(() => {
@@ -53,8 +57,8 @@ export default function App() {
   }, [settings]);
 
   // Current queried list of matching SAM vendors
-  const [vendors, setVendors] = useState<Vendor[]>(defaultMockResponse.entityData);
-  const [totalRecords, setTotalRecords] = useState<number>(defaultMockResponse.totalRecords);
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+  const [totalRecords, setTotalRecords] = useState<number>(0);
 
   // App Sharing URL
   const appUrl = "https://ais-pre-vu47tdf4uy7utbxckfpxsq-1057002491055.asia-southeast1.run.app";
@@ -160,6 +164,10 @@ export default function App() {
         if (data && Array.isArray(data.entityData)) {
           setVendors(data.entityData);
           setTotalRecords(data.totalRecords || data.entityData.length);
+          setSearchedNaics(formData.naicsCode || "");
+          setSearchedKeywords(`${formData.solicitationTitle || ""} ${formData.keywordsList || ""}`);
+          setSelectedForCompare([]);
+          setShowCompareView(false);
           setSearchPerformed(true);
         } else {
           throw new Error("Invalid API response format. Missing 'entityData' array.");
@@ -208,6 +216,10 @@ export default function App() {
 
         setVendors(paginatedList);
         setTotalRecords(list.length);
+        setSearchedNaics(formData.naicsCode || "");
+        setSearchedKeywords(`${formData.solicitationTitle || ""} ${formData.keywordsList || ""}`);
+        setSelectedForCompare([]);
+        setShowCompareView(false);
         setSearchPerformed(true);
         setIsLoading(false);
       }, 1200);
@@ -215,8 +227,8 @@ export default function App() {
   };
 
   const handleResetSearch = () => {
-    setVendors(defaultMockResponse.entityData);
-    setTotalRecords(defaultMockResponse.totalRecords);
+    setVendors([]);
+    setTotalRecords(0);
     setSearchPerformed(false);
     setActiveTab("search");
   };
@@ -254,9 +266,6 @@ export default function App() {
               <h2 className="font-display text-2xl font-extrabold tracking-tight sm:text-3xl lg:text-4xl bg-gradient-to-r from-indigo-300 via-purple-350 to-pink-350 bg-clip-text text-transparent">
                 Identify Top Bidding Vendors
               </h2>
-              <p className="text-sm text-slate-400">
-                Sift through historical SAM awards and capability profiles dynamically. Pinpoint small businesses, veteran status, and technical competencies instantly.
-              </p>
             </div>
 
             {/* Sourcing Error Banner */}
@@ -319,13 +328,7 @@ export default function App() {
                     <Activity className="h-6 w-6 animate-spin" />
                   </div>
                   <div>
-                    <h3 className="font-display text-lg font-bold text-white animate-pulse">Running SAM Analytics pipeline...</h3>
-                    <p className="text-xs text-slate-450 mt-1 max-w-md mx-auto">
-                      {settings.useLiveApi 
-                        ? `Proxying requirements body to live endpoint: ${settings.endpointUrl}`
-                        : "Querying semantic model registries, scoring past performance criteria, and matching SBA categorical sizes..."
-                      }
-                    </p>
+                    <h3 className="font-display text-lg font-bold text-white animate-pulse">Running Analytics pipeline...</h3>
                   </div>
                 </div>
 
@@ -365,14 +368,6 @@ export default function App() {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <button
-                      id="btn-return-search"
-                      onClick={() => setActiveTab("search")}
-                      className="flex items-center gap-1.5 rounded-xl border border-white/15 px-3.5 py-2 text-xs font-semibold text-slate-200 bg-white/5 hover:bg-white/10 hover:text-white shadow-sm transition-all cursor-pointer"
-                    >
-                      <ArrowLeft className="h-4 w-4" />
-                      Refine requirements
-                    </button>
 
                     {searchPerformed && (
                       <button
@@ -389,11 +384,22 @@ export default function App() {
                 {/* Grid list of cards */}
                 {vendors.length > 0 ? (
                   <div className="space-y-6">
-                    {vendors.map((vendor, index) => (
+                    {[...vendors].sort((a, b) => (b.justification?.overallScore || 0) - (a.justification?.overallScore || 0)).map((vendor, index) => (
                       <VendorCard
                         key={vendor.entityRegistration.ueiSAM || index}
                         vendor={vendor}
                         index={index}
+                        searchedNaics={searchedNaics}
+                        isSelectedForCompare={selectedForCompare.includes(vendor.entityRegistration.ueiSAM)}
+                        onToggleCompare={() => {
+                          const id = vendor.entityRegistration.ueiSAM;
+                          if (!id) return;
+                          setSelectedForCompare(prev =>
+                            prev.includes(id)
+                              ? prev.filter(x => x !== id)
+                              : prev.length < 4 ? [...prev, id] : prev
+                          );
+                        }}
                       />
                     ))}
                   </div>
@@ -424,10 +430,36 @@ export default function App() {
           </div>
         )}
 
-        {/* Tab 3: Detailed Instructions */}
-        {activeTab === "about" && <HowItWorks />}
-
       </main>
+
+      {/* Floating Compare Bar */}
+      {selectedForCompare.length >= 2 && activeTab === "results" && !isLoading && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-xl border border-indigo-500/30 bg-slate-900/95 backdrop-blur-xl px-5 py-3 shadow-2xl">
+          <span className="text-xs font-semibold text-slate-300">{selectedForCompare.length} vendors selected</span>
+          <button
+            onClick={() => setShowCompareView(true)}
+            className="rounded-lg bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-500 transition cursor-pointer"
+          >
+            Compare
+          </button>
+          <button
+            onClick={() => setSelectedForCompare([])}
+            className="rounded-lg bg-white/10 px-3 py-2 text-xs font-medium text-slate-300 hover:bg-white/15 transition cursor-pointer"
+          >
+            Clear
+          </button>
+        </div>
+      )}
+
+      {/* Compare Panel Overlay */}
+      {showCompareView && (
+        <ComparePanel
+          vendors={vendors.filter(v => selectedForCompare.includes(v.entityRegistration.ueiSAM))}
+          searchedNaics={searchedNaics}
+          searchedKeywords={searchedKeywords}
+          onClose={() => setShowCompareView(false)}
+        />
+      )}
 
       {/* Settings Side Drawer Panel */}
       <SettingsPanel
@@ -442,10 +474,7 @@ export default function App() {
       {/* Portal Footer */}
       <footer className="bg-slate-950/40 border-t border-white/10 py-6 mt-12 backdrop-blur-xl">
         <div className="mx-auto max-w-7xl px-4 text-center text-xs text-slate-500 space-y-1 sm:px-6 lg:px-8">
-          <p>© 2026 Federal Vendor Intelligence Portal. All rights reserved.</p>
-          <p className="font-mono text-[10px] text-slate-600">
-            Connected Env Host URL: {appUrl}
-          </p>
+          <p>© 2026 Qualified Vendor MVP</p>
         </div>
       </footer>
 

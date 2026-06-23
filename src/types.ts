@@ -73,6 +73,7 @@ export interface Justification {
   naicsSetAsideFit?: number;
   agencyRelationship?: number;
   justification: string;
+  relevantCapabilities?: string[];
 }
 
 export interface Vendor {

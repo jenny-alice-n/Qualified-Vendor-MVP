@@ -47,9 +47,6 @@ export default function SettingsPanel({
                     <h2 className="font-display text-base font-bold text-white">
                       API Connection Wizard
                     </h2>
-                    <p className="text-xs text-slate-400">
-                      Bridge live telemetry & database requests
-                    </p>
                   </div>
                 </div>
                 <button
@@ -109,9 +106,6 @@ export default function SettingsPanel({
                     <h3 className="font-display text-sm font-bold text-white">
                       Enable Live API Requests
                     </h3>
-                    <p className="text-xs text-slate-300">
-                      If enabled, we will proxy searches to your custom remote secure server.
-                    </p>
                   </div>
                   <button
                     id="toggle-live-api"
@@ -147,9 +141,6 @@ export default function SettingsPanel({
                       placeholder="https://your-api.com/v1/qualified-vendors"
                       className="w-full rounded-lg border border-white/12 bg-black/35 px-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition-all outline-none"
                     />
-                    <p className="mt-1 text-[11px] text-slate-450">
-                      Accepts standard POST bodies. Requests are safely proxied to prevent CORS errors.
-                    </p>
                   </div>
 
                   <div className="pt-2">
@@ -181,9 +172,6 @@ export default function SettingsPanel({
                       placeholder="X-API-Key"
                       className="w-full rounded-lg border border-white/12 bg-black/35 px-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition-all outline-none"
                     />
-                    <p className="mt-1 text-[11px] text-slate-450">
-                      The HTTP Header that transmits your credential (e.g. <code className="bg-white/10 px-1.5 py-0.5 rounded text-indigo-300 font-mono">X-API-Key</code> or <code className="bg-white/10 px-1.5 py-0.5 rounded text-indigo-300 font-mono">Authorization</code>)
-                    </p>
                   </div>
                 </div>
               </div>
@@ -247,9 +235,6 @@ export default function SettingsPanel({
                       <span className="block text-xs font-semibold text-indigo-305 uppercase tracking-wide font-mono">
                         Generate AI Justification
                       </span>
-                      <span className="block text-[11px] text-slate-450">
-                        Ask system to compute alignment fit scores.
-                      </span>
                     </div>
                     <button
                       id="toggle-generate-just"
@@ -264,44 +249,8 @@ export default function SettingsPanel({
                     </button>
                   </div>
 
-                  {/* VPN/Bypass Proxy Toggle */}
-                  <div className="flex items-center justify-between p-1 pt-1.5 border-t border-white/5">
-                    <div className="space-y-0.5 max-w-[75%]">
-                      <span className="block text-xs font-semibold text-indigo-305 uppercase tracking-wide font-mono flex items-center gap-1.5">
-                        Bypass Server Proxy (CORS-mode)
-                      </span>
-                      <span className="block text-[11px] text-slate-400">
-                        Query directly from your browser. Necessary if your target URL is located inside a <strong>private company VPN</strong>.
-                      </span>
-                    </div>
-                    <button
-                      id="toggle-bypass-proxy"
-                      type="button"
-                      onClick={() => handleChange("bypassBackendProxy", !settings.bypassBackendProxy)}
-                      className="rounded-lg bg-white/10 p-1 hover:bg-white/15 cursor-pointer"
-                    >
-                      {settings.bypassBackendProxy ? (
-                        <span className="text-xs font-bold text-indigo-300 bg-indigo-500/10 border border-indigo-500/20 px-2 py-1 rounded">ON</span>
-                      ) : (
-                        <span className="text-xs font-bold text-slate-400 bg-white/5 px-2 py-1 rounded">OFF</span>
-                      )}
-                    </button>
-                  </div>
                 </div>
               </div>
-
-              {/* Troubleshooting Info */}
-              <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 space-y-2 shadow-lg shadow-black/20">
-                <h5 className="flex items-center gap-1.5 text-xs font-bold text-amber-300">
-                  <AlertCircle className="h-4 w-4 text-amber-400" />
-                  <span>Important Note on Sandbox Testing</span>
-                </h5>
-                <p className="text-[11px] text-amber-200/80 leading-relaxed">
-                  If you run in <strong>Sandbox Mode</strong> (Live disabled), searches such as <em>&quot;medical equipments&quot;</em> yield the comprehensive dataset you supplied. 
-                  Live mode allows bridging with any remote backend server seamlessly.
-                </p>
-              </div>
-
             </div>
 
             {/* Footer */}

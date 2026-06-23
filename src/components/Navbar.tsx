@@ -1,4 +1,4 @@
-import { Building2, Share2, HelpCircle, Layers, Lightbulb } from "lucide-react";
+import { Building2, Share2, Layers } from "lucide-react";
 import { useState } from "react";
 
 interface NavbarProps {
@@ -6,8 +6,8 @@ interface NavbarProps {
   appUrl: string;
   onOpenSettings: () => void;
   resultsCount: number;
-  activeTab: "search" | "results" | "about";
-  setActiveTab: (tab: "search" | "results" | "about") => void;
+  activeTab: "search" | "results";
+  setActiveTab: (tab: "search" | "results") => void;
 }
 
 export default function Navbar({
@@ -41,11 +41,8 @@ export default function Navbar({
           </div>
           <div>
             <h1 className="font-display text-lg font-bold tracking-tight text-white sm:text-xl">
-              Federal Vendor Intelligence
+              Qualified Vendor MVP
             </h1>
-            <p className="hidden text-xs text-slate-400 sm:block font-sans">
-              SAM.gov intelligence & award analysis engine
-            </p>
           </div>
         </div>
 
@@ -82,19 +79,6 @@ export default function Navbar({
               </span>
             )}
           </button>
-
-          <button
-            id="nav-tab-about"
-            onClick={() => setActiveTab("about")}
-            className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all sm:text-sm ${
-              activeTab === "about"
-                ? "bg-white/15 text-white border border-white/10 shadow-sm"
-                : "text-slate-300 hover:bg-white/5 hover:text-white"
-            }`}
-          >
-            <HelpCircle className="h-4 w-4" />
-            <span>How It Works</span>
-          </button>
         </nav>
 
         {/* Connection status and Share */}
@@ -114,20 +98,6 @@ export default function Navbar({
               useLiveApi ? "bg-emerald-400" : "bg-amber-400"
             }`} />
             <span>{useLiveApi ? "Live Mode" : "Sandbox Mode"}</span>
-          </button>
-
-          {/* Share button */}
-          <button
-            id="btn-share-app"
-            onClick={handleShare}
-            className={`flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold transition-all shadow-sm ${
-              copied
-                ? "border-indigo-500 bg-indigo-500/20 text-indigo-300"
-                : "border-white/10 bg-white/5 text-slate-350 hover:bg-white/10 hover:text-white"
-            }`}
-          >
-            <Share2 className="h-3.5 w-3.5" />
-            <span>{copied ? "Copied!" : "Share"}</span>
           </button>
         </div>
 

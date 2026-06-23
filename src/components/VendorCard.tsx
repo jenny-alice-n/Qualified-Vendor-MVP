@@ -1,34 +1,25 @@
 import { useState } from "react";
 import { 
-  Building, 
   MapPin, 
-  Globe, 
   Copy, 
   Check, 
   ShieldCheck, 
   Calendar, 
-  FileText, 
-  ChevronRight, 
-  ChevronDown, 
   ExternalLink,
-  Award,
-  BookOpen,
-  Mail,
-  User,
-  Activity
 } from "lucide-react";
 import { Vendor } from "../types";
 
 interface VendorCardProps {
   vendor: Vendor;
   index: number;
+  searchedNaics?: string;
+  isSelectedForCompare?: boolean;
+  onToggleCompare?: () => void;
 }
 
-export default function VendorCard({ vendor, index }: VendorCardProps) {
+export default function VendorCard({ vendor, index, searchedNaics, isSelectedForCompare, onToggleCompare }: VendorCardProps) {
   const [copied, setCopied] = useState(false);
   const [activeSubTab, setActiveSubTab] = useState<"justification" | "capabilities" | "profile" | "naics">("justification");
-  const [showOutreach, setShowOutreach] = useState(false);
-  const [outreachCopied, setOutreachCopied] = useState(false);
 
   const reg = vendor.entityRegistration;
   const core = vendor.coreData;
@@ -55,35 +46,6 @@ export default function VendorCard({ vendor, index }: VendorCardProps) {
     }
   };
 
-  const generateOutreachEmail = () => {
-    const capsText = summaryInfo?.awardCapabilities?.slice(0, 3).join(", ") || "specialized services";
-    return `Subject: Partnership Opportunity: SAM.gov Solicitation Alignment
-
-Dear Team at ${reg.legalBusinessName},
-
-I hope this message finds you well. 
-
-We have identified an exciting opportunity on SAM.gov that aligns closely with your proven past performance and active core capabilities. Specifically, our analysis noted your exceptional track record in ${capsText} and your highly matching NAICS code profiles.
-
-We believe that combining our operational capacities could form a powerful, compliant bidding vehicle for this upcoming award. 
-
-Would you be open to a brief introductory call this week to review the opportunity specifications and explore a subcontracting or teaming alignment?
-
-Looking forward to your response.
-
-Best regards,
-
-[Your Name]
-Federal Bid Analyst
-[Your Company]`;
-  };
-
-  const handleCopyOutreach = () => {
-    navigator.clipboard.writeText(generateOutreachEmail());
-    setOutreachCopied(true);
-    setTimeout(() => setOutreachCopied(false), 2000);
-  };
-
   return (
     <div className="glass-card rounded-2xl overflow-hidden animate-slide-up">
       
@@ -96,11 +58,6 @@ Federal Bid Analyst
             <h3 className="font-display text-base font-extrabold text-white tracking-tight sm:text-lg">
               {reg.legalBusinessName}
             </h3>
-            {reg.dbaName && (
-              <span className="text-xs font-semibold text-indigo-200/50 font-sans">
-                (DBA: {reg.dbaName})
-              </span>
-            )}
           </div>
 
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-slate-400 animate-fade-in">
@@ -129,7 +86,19 @@ Federal Bid Analyst
 
         {/* Alignment Score Badge */}
         <div className="flex sm:flex-col items-center sm:items-end gap-2 shrink-0">
-          <div className={`rounded-xl border ${scoreInfo.border} ${scoreInfo.bg} ${scoreInfo.text} px-4 py-1.5 text-center shadow-lg shadow-black/20`}>
+          {onToggleCompare && (
+            <button
+              onClick={onToggleCompare}
+              className={`rounded-lg px-3 py-1.5 text-[11px] font-bold transition cursor-pointer border ${
+                isSelectedForCompare
+                  ? "bg-indigo-500/20 border-indigo-500/40 text-indigo-300"
+                  : "bg-white/5 border-white/10 text-slate-400 hover:bg-white/10 hover:text-white"
+              }`}
+            >
+              {isSelectedForCompare ? "✓ Selected" : "Compare"}
+            </button>
+          )}
+          <div className="rounded-xl border border-white/15 bg-white/5 text-white px-4 py-1.5 text-center shadow-lg shadow-black/20">
             <span className="block text-[10px] font-bold uppercase tracking-wider font-mono opacity-80">
               Match Score
             </span>
@@ -137,11 +106,6 @@ Federal Bid Analyst
               {just?.overallScore || 85}%
             </span>
           </div>
-          {summaryInfo?.similarityScore && (
-            <span className="text-[10px] text-slate-450 font-mono">
-              Sim Score: {(summaryInfo.similarityScore * 100).toFixed(1)}%
-            </span>
-          )}
         </div>
 
       </div>
@@ -191,7 +155,7 @@ Federal Bid Analyst
           >
             Award Capabilities
           </button>
-          <button
+          {/* <button
             id={`tab-${reg.cageCode}-profile`}
             onClick={() => setActiveSubTab("profile")}
             className={`border-b-2 py-3 transition ${
@@ -201,7 +165,7 @@ Federal Bid Analyst
             }`}
           >
             Corporate Dossier
-          </button>
+          </button> */}
           <button
             id={`tab-${reg.cageCode}-naics`}
             onClick={() => setActiveSubTab("naics")}
@@ -254,28 +218,18 @@ Federal Bid Analyst
 
         {/* Tab 2: Award Capabilities */}
         {activeSubTab === "capabilities" && (
-          <div className="space-y-4 animate-fade-in">
-            {summaryInfo?.vendorSummary && (
-              <div className="text-xs text-slate-300 leading-relaxed border-l-2 border-indigo-500/40 pl-3">
-                <span className="font-bold text-indigo-300 block mb-1 font-sans text-xs">Capability Statement Outline:</span>
-                {summaryInfo.vendorSummary}
-              </div>
-            )}
-            
+          <div className="animate-fade-in">
             {summaryInfo?.awardCapabilities && summaryInfo.awardCapabilities.length > 0 ? (
               <div>
-                <span className="text-[10px] font-bold text-slate-400 uppercase font-mono block mb-2">Verified Contract Deliveries:</span>
-                <div className="flex flex-wrap gap-1.5">
+                <span className="text-[10px] font-bold text-slate-400 uppercase font-mono block mb-3">Award Capabilities:</span>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-xs text-slate-300">
                   {summaryInfo.awardCapabilities.map((cap, idx) => (
-                    <span
-                      key={idx}
-                      className="inline-flex items-center gap-1 rounded-full bg-indigo-500/10 border border-indigo-550/20 px-2.5 py-0.5 text-xs text-indigo-300 font-medium shadow-sm"
-                    >
-                      <Award className="h-3 w-3 text-indigo-400" />
-                      {cap}
-                    </span>
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-indigo-400 shrink-0" />
+                      <span>{cap}</span>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
             ) : (
               <p className="text-xs text-slate-400 italic">No award capabilities parsed yet.</p>
@@ -283,11 +237,10 @@ Federal Bid Analyst
           </div>
         )}
 
-        {/* Tab 3: Corporate Dossier */}
+        {/* Tab 3: Corporate Dossier - commented out
         {activeSubTab === "profile" && (
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 text-xs leading-relaxed text-slate-300">
             
-            {/* Address Info */}
             <div className="space-y-2">
               <span className="text-[10px] font-bold text-indigo-350 uppercase font-mono block">Mailing & Physical Location</span>
               <div className="bg-white/5 border border-white/10 p-3 rounded-xl flex items-start gap-2 shadow-md">
@@ -300,7 +253,6 @@ Federal Bid Analyst
               </div>
             </div>
 
-            {/* General Info */}
             <div className="space-y-2">
               <span className="text-[10px] font-bold text-indigo-350 uppercase font-mono block">Dossier Details</span>
               <div className="bg-white/5 border border-white/10 p-3 rounded-xl space-y-1.5 shadow-md">
@@ -331,37 +283,35 @@ Federal Bid Analyst
 
           </div>
         )}
+        */}
 
         {/* Tab 4: Matching NAICS Codes */}
         {activeSubTab === "naics" && (
           <div className="space-y-2">
-            <span className="text-[10px] font-bold text-indigo-350 uppercase font-mono block mb-2">Primary Registered NAICS:</span>
+            <span className="text-[10px] font-bold text-indigo-350 uppercase font-mono block mb-2">Registered NAICS Codes:</span>
             <div className="max-h-40 overflow-y-auto space-y-2 pr-1.5">
-              {vendor.assertions?.goodsAndServices?.naicsList?.map((code, idx) => (
-                <div 
-                  key={idx} 
-                  className="flex items-center justify-between text-xs p-2.5 bg-white/5 border border-white/10 rounded-xl shadow-sm hover:border-indigo-500/30 transition-colors"
-                >
-                  <div className="space-y-0.5">
-                    <span className="font-mono font-black text-white bg-white/10 px-1.5 py-0.5 rounded leading-none">
+              {vendor.assertions?.goodsAndServices?.naicsList?.map((code, idx) => {
+                const isMatch = searchedNaics && code.naicsCode === searchedNaics;
+                return (
+                  <div 
+                    key={idx} 
+                    className={`flex items-center text-xs p-2.5 rounded-xl shadow-sm ${
+                      isMatch
+                        ? "bg-emerald-500/15 border border-emerald-500/30"
+                        : "bg-white/5 border border-white/10"
+                    }`}
+                  >
+                    <span className={`font-mono font-black px-1.5 py-0.5 rounded leading-none ${
+                      isMatch ? "text-emerald-300 bg-emerald-500/20" : "text-white bg-white/10"
+                    }`}>
                       {code.naicsCode}
                     </span>
-                    <span className="text-slate-350 ml-2 font-medium">
+                    <span className={`ml-2 font-medium ${isMatch ? "text-emerald-200" : "text-slate-350"}`}>
                       {code.naicsDescription}
                     </span>
                   </div>
-
-                  {code.sbaSmallBusiness && (
-                    <span className={`inline-flex rounded px-1.5 py-0.5 text-[10px] font-mono font-bold uppercase tracking-wider ${
-                      code.sbaSmallBusiness === "Y" 
-                        ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/20" 
-                        : "bg-white/10 text-slate-400"
-                    }`}>
-                      SBA Small: {code.sbaSmallBusiness}
-                    </span>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -376,47 +326,7 @@ Federal Bid Analyst
           <span>Activation: <strong className="text-slate-300 font-medium">{reg.activationDate || "Active"}</strong></span>
         </div>
 
-        <div className="flex gap-2">
-          {/* Email generator toggle */}
-          <button
-            id={`btn-toggle-outreach-${reg.cageCode}`}
-            onClick={() => setShowOutreach(!showOutreach)}
-            className="flex items-center gap-1 text-xs font-bold text-indigo-200 bg-indigo-500/20 hover:bg-indigo-500/35 rounded-lg px-3 py-1.5 transition-all cursor-pointer border border-indigo-500/30"
-          >
-            <Mail className="h-3.5 w-3.5" />
-            <span>Teaming Invite</span>
-            {showOutreach ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
-          </button>
-        </div>
-
       </div>
-
-      {/* Outreach Drawer */}
-      {showOutreach && (
-        <div className="border-t border-white/10 bg-slate-950/20 p-5 space-y-3 animate-slide-down">
-          <div className="flex justify-between items-center">
-            <span className="text-xs font-bold text-indigo-300 uppercase tracking-widest font-mono">
-              Draft Partnership Invitation
-            </span>
-            <button
-              id={`btn-copy-outreach-${reg.cageCode}`}
-              onClick={handleCopyOutreach}
-              className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1.5 rounded border shadow-sm transition-all cursor-pointer ${
-                outreachCopied 
-                  ? "bg-emerald-500/20 border-emerald-500/30 text-emerald-300" 
-                  : "bg-white/5 border-white/10 text-slate-200 hover:bg-white/10"
-              }`}
-            >
-              {outreachCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5 text-slate-400" />}
-              <span>{outreachCopied ? "Copied proposal!" : "Copy Email"}</span>
-            </button>
-          </div>
-
-          <pre className="p-3 bg-slate-950/40 border border-white/10 rounded-xl text-slate-300 font-sans text-xs whitespace-pre-wrap leading-relaxed shadow-inner max-h-56 overflow-y-auto">
-            {generateOutreachEmail()}
-          </pre>
-        </div>
-      )}
 
     </div>
   );
